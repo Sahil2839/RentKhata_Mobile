@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5" style="max-width:700px;">
+  <h2 class="mb-4">Edit Tenant - {{ tenant.name }}</h2>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <!-- Row 1: Rent | Due Amount -->
+    <div class="row g-3 mb-3">
+      {% for field in form %}
+        {% if field.name == "rent" %}
+          <div class="col-md-6">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% elif field.name == "due_amount" %}
+          <div class="col-md-6">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Row 2: Meter Rate | Meter Reading -->
+    <div class="row g-3 mb-3">
+      {% for field in form %}
+        {% if field.name == "meter_rate" %}
+          <div class="col-md-6">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% elif field.name == "meter_reading" %}
+          <div class="col-md-6">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Full-width fields -->
+    {% for field in form %}
+      {% if field.name not in "rent due_amount meter_rate meter_reading" %}
+        <div class="mb-3">
+          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {{ field.errors }}
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    <!-- Submit buttons -->
+    <div class="mt-4 text-end">
+      <a href="{% url 'manage_tenants' %}" class="btn btn-secondary me-2">Cancel</a>
+      <button type="submit" class="btn btn-success">Save Changes</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

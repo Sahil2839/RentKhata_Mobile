@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5" style="max-width:600px;">
+  <div class="card shadow-sm rounded-4 p-4">
+    <h3 class="mb-4 text-center">Your Profile</h3>
+
+    <form method="POST" id="profileForm">
+      {% csrf_token %}
+      
+      <!-- First Name -->
+      <div class="mb-3">
+        <label class="form-label">Name</label>
+        {{ form.first_name }}
+      </div>
+
+      <!-- Username -->
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        {{ form.username }}
+      </div>
+
+      <!-- Phone Number -->
+      <div class="mb-3">
+        <label class="form-label">Phone Number</label>
+        {{ form.phone_number }}
+      </div>
+
+      <!-- Email -->
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        {{ form.email }}
+      </div>
+
+      <!-- Buttons -->
+      <div class="d-flex justify-content-between mt-4">
+        <button type="button" id="editBtn" class="btn btn-outline-primary">Edit</button>
+        <button type="submit" id="saveBtn" class="btn btn-success" style="display:none;">Save</button>
+        <a href="{% url 'password_change' %}" class="btn btn-warning">Change Password</a>
+      </form>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Logout</button>
+        </form>
+      </div>
+  </div>
+</div>
+
+<script>
+  const editBtn = document.getElementById('editBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const formFields = document.querySelectorAll('#profileForm input');
+
+  // Make fields readonly initially
+  formFields.forEach(f => f.readOnly = true);
+
+  // Edit button enables fields
+  editBtn.addEventListener('click', () => {
+    formFields.forEach(f => f.readOnly = false);
+    editBtn.style.display = 'none';
+    saveBtn.style.display = 'inline-block';
+  });
+</script>
+{% endblock %}

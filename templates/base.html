@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}RentKhata{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+  <style>
+    body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f6fa;
+    overflow-x: hidden;
+    margin: 0;
+}
+
+/* ===== Navbar ===== */
+.navbar-dark {
+    background-color: #0a0a0aff;
+    z-index: 1050; /* ensure navbar is on top of sidebar */
+    position: relative; /* stacking context */
+}
+
+.navbar-brand {
+    margin-left: 0.5rem;
+}
+
+#sidebarToggle {
+    border: none;
+    font-size: 1.8rem;
+    color: white;
+    background: none;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+    background-color: #ffffff;
+    border-right: 1px solid #e1e4e8;
+    position: fixed;
+    top: 56px; /* navbar height */
+    left: -230px; /* hidden by default */
+    width: 230px;
+    height: calc(100% - 56px); /* full height minus navbar */
+    overflow-y: auto;
+    transition: left 0.3s;
+    z-index: 1000; /* below navbar */
+    padding: 1rem;
+}
+
+.sidebar.show {
+    left: 0;
+}
+
+.sidebar h5 {
+    padding-top: 10px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e1e4e8;
+    margin-bottom: 20px;
+}
+
+.sidebar .nav-link {
+    color: #000610ff;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #f0f2f5;
+    border-radius: 5px;
+}
+
+/* ===== Main Content ===== */
+.content-wrapper {
+    padding: 2rem;
+    transition: filter 0.3s;
+}
+
+.content-wrapper.dim {
+    filter: brightness(0.85);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 991px) {
+    .sidebar {
+        top: 56px;
+        height: calc(100% - 56px);
+    }
+}
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <button id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+      <a class="navbar-brand fw-bold" href="{% url 'home' %}">RentKhata</a>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="nav-item">
+            <a class="nav-link" href="{% url 'profile' %}">
+              <i class="bi bi-person-circle fs-5"></i>
+            </a>
+          </li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Signup</a></li>
+        {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav> 
+
+
+  <!-- Sidebar -->
+<nav id="sidebar" class="sidebar">
+  <h5>Menu</h5>
+  <ul class="nav flex-column">
+
+    {% if request.user.is_authenticated %}
+      {% if request.user.role == "landlord" %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'manage_tenants' %}">View Tenants</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'all_bills' %}">Bills</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'documents_dashboard' %}">Documents</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'chat' %}">Maintenance Requests</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+
+      {% elif request.user.role == "tenant" %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'all_bills' %}">My Bills</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'chat' %}">Chat</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'tenant_invites' %}">Invites</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Profile</a></li>
+
+      {% endif %}
+    {% else %}
+      <!-- Guest menu -->
+      <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+      <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Sign Up</a></li>
+    {% endif %}
+
+  </ul>
+</nav>
+
+
+  <!-- Main Content -->
+  <main id="content" class="content-wrapper">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}
+    <!-- Child templates inject content here -->
+    {% endblock %}
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const sidebar = document.getElementById('sidebar');
+const content = document.getElementById('content');
+const toggle = document.getElementById('sidebarToggle');
+
+// Toggle sidebar
+toggle.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevent immediate close
+    sidebar.classList.toggle('show');
+    content.classList.toggle('dim'); // Only content dims
+});
+
+// Close sidebar on outside click
+document.addEventListener('click', (e) => {
+    if (sidebar.classList.contains('show')) {
+        if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+            sidebar.classList.remove('show');
+            content.classList.remove('dim');
+        }
+    }
+});
+
+// Prevent clicks inside sidebar from closing it
+sidebar.addEventListener('click', (e) => {
+    e.stopPropagation();
+});
+</script>
+
+</body>
+</html>

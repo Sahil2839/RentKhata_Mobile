@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Billing for 
+    {% if tenant_type == "Offline" %}
+      {{ tenant.name }}
+    {% else %}
+      {{ tenant.tenant.get_full_name|default:tenant.tenant.username }}
+    {% endif %}
+  </h2>
+
+  <!-- Back button -->
+  <div class="mb-3">
+    <a href="{% url 'manage_tenants' %}" class="btn btn-secondary">&larr; Back</a>
+  </div>
+
+  <!-- List Bills -->
+  <div class="card">
+    <div class="card-header">Previous Bills</div>
+    <div class="card-body p-0">
+      {% if bills %}
+      <table class="table table-striped mb-0">
+        <thead>
+          <tr>
+            <th>Created</th><th>Period</th><th>Total</th><th>Paid</th><th>Remaining</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for bill in bills %}
+          <tr>
+            <td>{{ bill.created_at|date:"d M Y" }}</td>
+            <td>{{ bill.start_date }} → {{ bill.end_date }}</td>
+            <td>₹{{ bill.total_bill_amount }}</td>
+            <td>₹{{ bill.amount_paid }}</td>
+            <td>₹{{ bill.remaining_due }}</td>
+            <td>
+              {% with rem=bill.remaining_due|default:0 paid=bill.amount_paid|default:0 %}
+                {% if rem == 0 %}
+                  <span class="badge bg-success">Paid</span>
+                {% elif rem < 0 %}
+                  <span class="badge bg-primary">Advance</span>
+                {% elif paid > 0 and rem > 0 %}
+                  <span class="badge bg-warning text-dark">Partial</span>
+                {% elif paid == 0 and rem > 0 %}
+                  <span class="badge bg-danger">Unpaid</span>
+                {% endif %}
+              {% endwith %}
+            </td>
+            <td>
+              <a href="{% url 'bill_detail' bill.id %}" class="btn btn-sm btn-primary">View</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <p class="p-3">No bills yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

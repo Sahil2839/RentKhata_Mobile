@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+
+<div class="container mt-5" style="max-width:850px;">
+  <div class="card shadow p-4 rounded-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="mb-0">Bill for {{ tenant_name }}</h3>
+      <small class="text-muted">{{ bill.created_at|date:"d M Y H:i" }}</small>
+    </div>
+
+    <p><strong>Billing Period:</strong> {{ bill.start_date }} → {{ bill.end_date }}</p>
+
+    <form method="POST" action="{% url 'bill_detail' bill.id %}" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <style>
+        .billing-table tr:nth-child(odd):not(.total-row):not(.remaining-row) {
+          background-color: #f8f9fa;
+        }
+        .billing-table tr th, .billing-table tr td {
+          vertical-align: middle;
+        }
+        #copyBtn {
+          min-width: 110px;
+        }
+      </style>
+
+      <table class="table table-bordered billing-table">
+        <tbody>
+          <tr><th>Rent</th><td>₹{{ bill.rent|intcomma }}</td></tr>
+          <tr><th>Previous Due</th><td>₹{{ bill.previous_due_amount|default:0|intcomma }}</td></tr>
+          <tr><th>Previous Meter Reading</th><td>{{ previous_meter|intcomma }}</td></tr>
+
+          <tr>
+            <th>Current Meter Reading</th>
+            <td>
+              <input type="number" name="current_meter_reading"
+                     value="{% if bill.current_meter_reading %}{{ bill.current_meter_reading }}{% else %}{{ previous_meter }}{% endif %}"
+                     class="form-control"
+                     min="{{ previous_meter }}"
+                     {% if request.user.role == "tenant" %}readonly{% endif %}>
+            </td>
+          </tr>
+
+          <!-- Meter Photo Upload + Preview -->
+          <tr>
+            <th>Meter Photo</th>
+            <td>
+              {% if request.user.role == "landlord" %}
+                <input type="file" name="meter_photo" accept="image/*" class="form-control">
+              {% endif %}
+
+              {% if bill.meter_photo %}
+                <div class="mt-2">
+                  <p class="mb-1 text-muted">Current:</p>
+                  <a href="{{ bill.meter_photo.url }}" target="_blank">
+                    <img src="{{ bill.meter_photo.url }}" alt="Meter Photo" 
+                         class="border rounded" style="max-width:200px; height:auto;">
+                  </a>
+                  <div class="mt-2 d-flex gap-3 align-items-center">
+                    {% if request.user.role == "landlord" %}
+                      <div class="form-check">
+                        <input type="checkbox" name="remove_photo" class="form-check-input" id="removePhoto">
+                        <label class="form-check-label" for="removePhoto">Remove photo</label>
+                      </div>
+                    {% endif %}
+                    <a href="{{ bill.meter_photo.url }}" download class="btn btn-sm btn-outline-primary">
+                      Download
+                    </a>
+                  </div>
+                </div>
+              {% endif %}
+            </td>
+          </tr>
+
+          <tr>
+            <th>Consumption</th>
+            <td>{{ consumption_units }} units × ₹{{ bill.meter_rate|intcomma }} = ₹{{ meter_bill_amount|intcomma }}</td>
+          </tr>
+
+          <tr>
+            <th>Misc Charge</th>
+            <td>
+              <input type="number" name="misc_charge" 
+                     value="{{ bill.misc_charge|default:0 }}" class="form-control" min="0"
+                     {% if request.user.role == "tenant" %}readonly{% endif %}>
+            </td>
+          </tr>
+
+          <tr>
+            <th>Misc Note</th>
+            <td>
+              <textarea name="misc_note" class="form-control" rows="2" {% if request.user.role == "tenant" %}readonly{% endif %}> {{ bill.misc_note|default_if_none:"" }}</textarea>
+            </td>
+          </tr>
+
+          <tr class="total-row table-danger text-white">
+            <th>Total</th><td>₹{{ total_amount|intcomma }}</td>
+          </tr>
+
+          <tr>
+            <th>Amount Paid</th>
+            <td>
+              <input type="number" name="amount_paid" 
+                     value="{{ bill.amount_paid|default:0 }}" class="form-control" min="0"
+                     {% if request.user.role == "tenant" %}readonly{% endif %}>
+            </td>
+          </tr>
+
+          <tr class="remaining-row 
+              {% if remaining_due == 0 %}table-success text-white
+              {% elif remaining_due > 0 %}table-warning
+              {% else %}table-info{% endif %}">
+            <th>Remaining Due</th>
+            <td>₹{{ remaining_due|intcomma }}</td>
+          </tr>
+
+          <tr><th>Status</th><td>{{ bill.get_status_display }}</td></tr>
+        </tbody>
+      </table>
+
+      <div class="mt-4 d-flex justify-content-between">
+        <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
+
+        {% if request.user.role == "landlord" %}
+          <div>
+            <button type="submit" class="btn btn-success me-2">Update Bill</button>
+            <button type="button" id="copyBtn" class="btn btn-outline-secondary" onclick="copyBill()">Copy Bill</button>
+          </div>
+        {% else %}
+          <button type="button" id="copyBtn" class="btn btn-outline-secondary" onclick="copyBill()">Copy Bill</button>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function copyBill() {
+  const copyBtn = document.getElementById("copyBtn");
+  const text = `Bill for: {{ tenant_name }}
+Period: {{ bill.start_date }} → {{ bill.end_date }}
+
+Rent: ₹{{ bill.rent }}
+{% if bill.previous_due_amount != 0 %}Previous Due: ₹{{ bill.previous_due_amount|default:0 }}{% endif %}
+{% if bill.current_meter_reading and previous_meter %}Meter Reading: {{ previous_meter }} → {{ bill.current_meter_reading }}
+Consumption: {{ consumption_units }} units × ₹{{ bill.meter_rate }} = ₹{{ meter_bill_amount }}{% endif %}
+{% if bill.misc_charge > 0 %}Misc Charge: ₹{{ bill.misc_charge }}{% if bill.misc_note %} ({{ bill.misc_note }}){% endif %}{% endif %}
+------------------------------------
+Total: ₹{{ total_amount }}
+{% if bill.amount_paid != 0 %}Amount Paid: ₹{{ bill.amount_paid|default:0 }}
+Remaining Due: ₹{{ remaining_due }}{% endif %}`;
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      copyBtn.innerText = "Copied!";
+      setTimeout(() => { copyBtn.innerText = "Copy Bill"; }, 2000);
+    }).catch(() => {
+      copyBtn.innerText = "Failed";
+      setTimeout(() => { copyBtn.innerText = "Copy Bill"; }, 2000);
+    });
+  } else {
+    copyBtn.innerText = "Failed";
+    setTimeout(() => { copyBtn.innerText = "Copy Bill"; }, 2000);
+  }
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="py-5" style="background: #f8f8f8; border-radius: 0 0 50% 50% / 20%;">
+  <div class="container text-center">
+    <h1 class="display-4 fw-bold mb-3" style="color: #333;">Welcome to RentKhata</h1>
+    <p class="lead mb-4" style="color: #555;">Simplify tenant management, billing, and payments in one place.</p>
+    <a href="{% url 'signup' %}" class="btn btn-secondary btn-lg rounded-pill me-2 shadow-sm">Get Started</a>
+    <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg rounded-pill shadow-sm">Login</a>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+  <div class="container">
+    <h2 class="text-center mb-5" style="color: #333;">Features You'll Love</h2>
+    <div class="row g-4 justify-content-center">
+
+      <div class="col-md-3">
+        <div class="card border-0 rounded-4 shadow-sm text-center p-4" style="background: #ffffff;">
+          <i class="bi bi-people-fill fs-1 mb-3" style="color: #6c757d;"></i>
+          <h5 class="card-title mb-2">Tenant Management</h5>
+          <p class="card-text text-muted">Easily manage all tenants in one place.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card border-0 rounded-4 shadow-sm text-center p-4" style="background: #ffffff;">
+          <i class="bi bi-currency-dollar fs-1 mb-3" style="color: #6c757d;"></i>
+          <h5 class="card-title mb-2">Automated Billing</h5>
+          <p class="card-text text-muted">Generate bills automatically and track payments with ease.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card border-0 rounded-4 shadow-sm text-center p-4" style="background: #ffffff;">
+          <i class="bi bi-envelope-fill fs-1 mb-3" style="color: #6c757d;"></i>
+          <h5 class="card-title mb-2">Invites & Notifications</h5>
+          <p class="card-text text-muted"> Invite tenants and notify them of bills and pending dues instantly.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card border-0 rounded-4 shadow-sm text-center p-4" style="background: #ffffff;">
+          <i class="bi bi-bar-chart-line-fill fs-1 mb-3" style="color: #6c757d;"></i>
+          <h5 class="card-title mb-2">Document Management</h5>
+          <p class="card-text text-muted">Centralize leases, contracts, and tenant files in one secure place.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="py-5 text-center" style="background: #e9ecef; border-radius: 50% 50% 0 0 / 20%;">
+  <div class="container">
+    <h2 class="mb-4" style="color: #333;">Ready to simplify your rental management?</h2>
+    <a href="{% url 'signup' %}" class="btn btn-secondary btn-lg rounded-pill shadow-sm">Sign Up Now</a>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<style>
+.btn-primary {
+    background-color: #080605ff;
+    border-color: #030303ff;      
+    color: #fff;              
+}
+
+.btn-primary:hover {
+    background-color: #4e4c4aff;
+    border-color: #0b0b0aff;
+}
+.btn-primary:focus,
+    .btn-primary:active {
+    background-color: #0d0e0eff !important;
+    border-color: #0d0e0eff !important;
+    box-shadow: none !important;
+    outline: none !important;
+    }
+
+</style>
+<h2 class="mb-4">Dashboard</h2>
+
+<div class="row g-4">
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Invites</h5>
+        <p class="card-text">Join landlord </p>
+        <a href="{% url 'tenant_invites' %}" class="btn btn-primary">View Invites</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Rent Payments</h5>
+        <p class="card-text">Track payment history and pending dues.</p>
+        <a href="#" class="btn btn-primary">View Payments</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Documents</h5>
+        <p class="card-text">Store and check all documents here.</p>
+        <a href="#" class="btn btn-primary">View Documents</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Maintenance Requests</h5>
+        <p class="card-text">Make maintenance requests.</p>
+        <a href="{% url 'chat' %}" class="btn btn-primary">Make Requests</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Bills</h5>
+        <p class="card-text">View billing history, summaries, and charts.</p>
+        <a href="{% url 'all_bills' %}" class="btn btn-primary">View Bills</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

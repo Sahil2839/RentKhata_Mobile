@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Tenant Documents</h2>
+
+  <!-- Offline Tenants -->
+  <div class="card mb-4 shadow">
+    <div class="card-header bg-dark text-white">
+      Offline Tenants
+    </div>
+    <ul class="list-group list-group-flush">
+      {% if offline_tenants %}
+        {% for tenant in offline_tenants %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ tenant.name }}
+            <a href="{% url 'tenant_documents' tenant.id 'offline' %}" class="btn btn-sm btn-primary">View Documents</a>
+          </li>
+        {% endfor %}
+      {% else %}
+        <li class="list-group-item text-muted">No offline tenants yet.</li>
+      {% endif %}
+    </ul>
+  </div>
+
+  <!-- Online Tenants -->
+  <div class="card shadow">
+    <div class="card-header bg-dark text-white">
+      Online Tenants
+    </div>
+    <ul class="list-group list-group-flush">
+      {% if online_tenants %}
+        {% for tenant in online_tenants %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ tenant.get_full_name|default:tenant.username }}
+            <a href="{% url 'tenant_documents' tenant.id 'online' %}" class="btn btn-sm btn-primary">View Documents</a>
+          </li>
+        {% endfor %}
+      {% else %}
+        <li class="list-group-item text-muted">No online tenants linked yet.</li>
+      {% endif %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

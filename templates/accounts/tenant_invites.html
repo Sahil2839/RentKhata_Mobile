@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Tenant Invites{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Pending Invites</h2>
+
+    {% if invites %}
+    <div class="row g-4">
+        {% for invite in invites %}
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 invite-card">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">From: {{ invite.sender.username }}</h5>
+                    <p class="card-text mb-1"><strong>Property:</strong> {{ invite.property_name|default:"-" }}</p>
+                    <p class="card-text mb-1"><strong>Rent:</strong> ₹{{ invite.rent|intcomma }}</p>
+                    <p class="card-text mb-1"><strong>Due Amount:</strong> ₹{{ invite.due_amount|intcomma }}</p>
+                    <p class="card-text mb-1"><strong>Meter Rate:</strong> ₹{{ invite.meter_rate|intcomma }} per unit</p>
+                    <p class="card-text mb-1"><strong>Starting Meter:</strong> {{ invite.starting_meter_reading|default:0 }}</p>
+                    <p class="card-text mb-1"><strong>Billing Period:</strong> {{ invite.start_date }} → {{ invite.end_date }}</p>
+                    {% if invite.note %}
+                    <p class="card-text mb-2"><strong>Note:</strong> {{ invite.note }}</p>
+                    {% endif %}
+                    
+                    <div class="mt-auto d-flex gap-2">
+                        <form method="POST" class="flex-grow-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="invite_id" value="{{ invite.id }}">
+                            <input type="hidden" name="action" value="accept">
+                            <button type="submit" class="btn btn-success w-100">Accept</button>
+                        </form>
+                        <form method="POST" class="flex-grow-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="invite_id" value="{{ invite.id }}">
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="btn btn-danger w-100">Reject</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p class="text-muted">No pending invites at the moment.</p>
+    {% endif %}
+</div>
+
+<style>
+    .invite-card:hover {
+        transform: translateY(-3px);
+        transition: transform 0.2s;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Chat{% endblock %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Landlord-Tenant Chat</h2>
+    <div class="row">
+        <!-- Sidebar: Tenants list -->
+        <div class="col-md-3">
+            <div class="list-group" id="tenant-list">
+                {% for tenant in tenants %}
+                <a href="#" class="list-group-item list-group-item-action" data-tenant-id="{{ tenant.id }}">
+                    {{ tenant.username }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Chat window -->
+        <div class="col-md-9 d-flex flex-column" style="height: 70vh;">
+            <div class="card flex-grow-1 mb-3">
+                <div class="card-header">
+                    <span id="chat-with">Select a tenant to chat</span>
+                </div>
+                <div class="card-body overflow-auto" id="chat-box" style="background-color:#f8f9fa;">
+                    <!-- Messages will appear here -->
+                </div>
+            </div>
+
+            <!-- Message input -->
+            <form id="chat-form" class="d-flex">
+                <input type="text" id="message-input" class="form-control me-2" placeholder="Type your message..." disabled>
+                <button class="btn btn-primary" type="submit" disabled>Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Optional inline CSS -->
+<style>
+    #chat-box .message {
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        border-radius: 15px;
+        max-width: 70%;
+        display: inline-block;
+    }
+    #chat-box .tenant-msg {
+        background-color: #d1f0ff;
+        align-self: flex-start;
+    }
+    #chat-box .landlord-msg {
+        background-color: #c8f7c5;
+        align-self: flex-end;
+        text-align: right;
+    }
+</style>
+
+<!-- Optional JS for dynamic behavior -->
+<script>
+    const tenantLinks = document.querySelectorAll('#tenant-list a');
+    const chatBox = document.getElementById('chat-box');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input');
+    const sendBtn = chatForm.querySelector('button');
+    const chatWith = document.getElementById('chat-with');
+
+    let currentTenantId = null;
+
+    tenantLinks.forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            currentTenantId = link.dataset.tenantId;
+            chatWith.textContent = `Chat with ${link.textContent}`;
+            messageInput.disabled = false;
+            sendBtn.disabled = false;
+
+            // Fetch messages from backend
+            fetch(`/chat/messages/${currentTenantId}/`)
+                .then(res => res.json())
+                .then(data => {
+                    chatBox.innerHTML = '';  // Clear previous messages
+                    data.messages.forEach(msg => {
+                        const div = document.createElement('div');
+                        div.classList.add('message', msg.sender === '{{ request.user.username }}' ? 'landlord-msg' : 'tenant-msg');
+                        div.textContent = msg.message;
+                        chatBox.appendChild(div);
+                    });
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                });
+        });
+    });
+
+    // Send message via AJAX
+    chatForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const msg = messageInput.value.trim();
+        if (!msg || !currentTenantId) return;
+
+        // Send message to backend
+        fetch(`/chat/send/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}', 
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `receiver_id=${currentTenantId}&message=${encodeURIComponent(msg)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            // Append the new message to the chat box
+            const div = document.createElement('div');
+            div.classList.add('message', 'landlord-msg');
+            div.textContent = data.message;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            messageInput.value = '';  // Clear the message input
+        });
+    });
+</script>
+
+{% endblock %}
