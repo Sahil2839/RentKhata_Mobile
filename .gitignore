@@ -1,34 +1,27 @@
 # Python
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.sqlite
 
-# Virtual environment
+# Virtualenv
 venv/
 renv/
-ENV/
 env/
-.venv/
 
 # Django
 *.log
 *.pot
 *.pyc
-*.pyo
-*.sqlite3
-db.sqlite3
+*.mo
+*.DS_Store
+/staticfiles/
 media/
-staticfiles/
+tenant_documents/
 
 # IDEs
 .vscode/
 .idea/
-*.sublime-project
-*.sublime-workspace
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Environment variables
-.env
