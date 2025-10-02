@@ -800,8 +800,8 @@ class CustomPasswordChangeView(PasswordChangeView):
 def create_superuser_view(request):
     # Change these values to whatever you want
     username = "admin"
-    email = "admin@example.com"
-    password = "StrongPassword123!"
+    email = "sahilch2839@gmail.com"
+    password = "SAHILchWOW(1)!"
 
     User = get_user_model()
 
