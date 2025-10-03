@@ -2,11 +2,23 @@
 {% load humanize %}
 {% block content %}
 
+<style>
+/* Reduce top margin on small screens */
+  @media (max-width: 576px) {
+    .mobile-top-margin {
+      margin-top: 0.5rem !important; /* small margin on mobile */
+    }
+  }
 
+  .billing-table th, .billing-table td {
+            padding: 0.45rem 0.6rem;
+            vertical-align: middle;
+            font-size: 0.95rem;
+        }
+</style>
 
-<div class="container mt-0">
-  <div class="card shadow p-3 rounded-3 mx-auto"
-       style="max-width: 900px; width: 95%;">
+<div class="container mobile-top-margin" style="max-width: 850px; padding-left:0.5rem; padding-right:0.5rem;">
+  <div class="card shadow p-4 rounded-3">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h3 class="mb-0">Bill for {{ tenant_name }}</h3>
       <small class="text-muted">{{ bill.created_at|date:"d M Y H:i" }}</small>
@@ -16,31 +28,6 @@
 
     <form method="POST" action="{% url 'bill_detail' bill.id %}" enctype="multipart/form-data">
       {% csrf_token %}
-
-      <style>
-      /* Billing table responsive */
-      .billing-table th, .billing-table td {
-          padding: 0.45rem 0.6rem;
-          vertical-align: middle;
-          font-size: 0.95rem;
-      }
-
-      /* Mobile adjustments */
-      @media (max-width: 576px) {
-          .card {
-              padding: 1rem; /* less padding on mobile */
-          }
-          .billing-table th, .billing-table td {
-              font-size: 0.85rem;
-              padding: 0.35rem 0.5rem;
-          }
-          .d-flex.flex-wrap.gap-2.mt-4.justify-content-between {
-              flex-direction: column; /* buttons stacked on small screens */
-              gap: 0.5rem;
-          }
-      }
-      </style>
-
       <table class="table table-bordered billing-table">
         <tbody>
           <tr><th>Rent</th><td>₹{{ bill.rent|intcomma }}</td></tr>
