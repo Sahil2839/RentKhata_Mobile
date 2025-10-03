@@ -8,7 +8,7 @@ from .decorators import guest_required, landlord_required, tenant_required
 from .models import CustomUser, LandlordRequest, OfflineTenants, LinkTenantLandlord, LinkRequest, Billing, ChatMessage, TenantDocument
 from .forms import OfflineTenantForm, InviteTenantForm, EditTenantForm, TenantDocumentForm, ProfileForm
 from datetime import date
-from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
@@ -807,4 +807,3 @@ class CustomPasswordChangeView(PasswordChangeView):
     def get_success_url(self):
         messages.success(self.request, "Password changed successfully ✅")
         return reverse_lazy("profile")
-    
