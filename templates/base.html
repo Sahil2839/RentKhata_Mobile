@@ -94,7 +94,7 @@
 </head>
 <body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark">
+  {% comment %} <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
       <button id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
       <a class="navbar-brand fw-bold" href="{% url 'home' %}">RentKhata</a>
@@ -115,7 +115,36 @@
         </ul>
       </div>
     </div>
-  </nav> 
+  </nav>  {% endcomment %}
+
+  <nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container-fluid">
+    
+    <!-- Left side: menu + brand -->
+    <div class="d-flex align-items-center">
+      <button id="sidebarToggle" aria-label="Toggle sidebar" class="btn btn-link text-white fs-4 m-0 p-0 me-2">☰</button>
+      <a class="navbar-brand fw-bold" href="{% url 'home' %}">RentKhata</a>
+    </div>
+
+    <!-- Right side: collapsible links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        {% if user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'profile' %}">
+              <i class="bi bi-person-circle fs-5"></i>
+            </a>
+          </li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Signup</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
 
 
   <!-- Sidebar -->

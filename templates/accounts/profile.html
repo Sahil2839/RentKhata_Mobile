@@ -4,6 +4,23 @@
   <div class="card shadow-sm rounded-4 p-4">
     <h3 class="mb-4 text-center">Your Profile</h3>
 
+    <style>
+  /* Make all buttons same height and width */
+  .btn-custom {
+    min-width: 120px;        /* Same width */
+    height: 40px;            /* Same height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (max-width: 576px) {
+    .btn-custom {
+      min-width: 100%;       /* Full width on mobile */
+    }
+  }
+</style>
+
     <form method="POST" id="profileForm">
       {% csrf_token %}
       
@@ -32,16 +49,16 @@
       </div>
 
       <!-- Buttons -->
-      <div class="d-flex justify-content-between mt-4">
-        <button type="button" id="editBtn" class="btn btn-outline-primary">Edit</button>
-        <button type="submit" id="saveBtn" class="btn btn-success" style="display:none;">Save</button>
-        <a href="{% url 'password_change' %}" class="btn btn-warning">Change Password</a>
+      <div class="d-flex flex-wrap gap-2 mt-4">
+        <button type="button" id="editBtn" class="btn btn-outline-primary btn-custom">Edit</button>
+        <button type="submit" id="saveBtn" class="btn btn-success btn-custom" style="display:none;">Save</button>
+        <a href="{% url 'password_change' %}" class="btn btn-warning btn-custom">Change Password</a>
       </form>
       <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Logout</button>
-        </form>
-      </div>
+        <button type="submit" class="btn btn-danger btn-custom">Logout</button>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -60,4 +77,5 @@
     saveBtn.style.display = 'inline-block';
   });
 </script>
+
 {% endblock %}
