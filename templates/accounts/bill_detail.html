@@ -4,11 +4,18 @@
 
 <style>
 /* Reduce top margin on small screens */
-  @media (max-width: 576px) {
-    .mobile-top-margin {
-      margin-top: 0.5rem !important; /* small margin on mobile */
+  .content-wrapper {
+    padding: 2rem;
+    transition: filter 0.3s;
+    max-width: 100%;   /* allow full width */
+}
+
+@media (max-width: 576px) {
+    .content-wrapper {
+        padding: 0.5rem !important;  /* small padding on mobile */
     }
-  }
+}
+
 
   .billing-table th, .billing-table td {
             padding: 0.45rem 0.6rem;
@@ -17,8 +24,8 @@
         }
 </style>
 
-<div class="container mobile-top-margin" style="max-width: 850px; padding-left:0.5rem; padding-right:0.5rem;">
-  <div class="card shadow p-4 rounded-3">
+<div class="container-fluid mt-2 px-1 px-sm-3" style="max-width:850px;">
+  <div class="card shadow p-3 p-sm-4 rounded-3">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h3 class="mb-0">Bill for {{ tenant_name }}</h3>
       <small class="text-muted">{{ bill.created_at|date:"d M Y H:i" }}</small>
@@ -28,7 +35,8 @@
 
     <form method="POST" action="{% url 'bill_detail' bill.id %}" enctype="multipart/form-data">
       {% csrf_token %}
-      <table class="table table-bordered billing-table">
+      <div class="table-responsive">
+        <table class="table table-bordered billing-table">
         <tbody>
           <tr><th>Rent</th><td>₹{{ bill.rent|intcomma }}</td></tr>
           <tr><th>Previous Due</th><td>₹{{ bill.previous_due_amount|default:0|intcomma }}</td></tr>
@@ -121,12 +129,13 @@
           <tr><th>Status</th><td>{{ bill.get_status_display }}</td></tr>
         </tbody>
       </table>
+    </div>
 
-      <div class="mt-4 d-flex justify-content-between">
+      <div class="mt-3 d-flex flex-column flex-sm-row justify-content-between gap-2">
         <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
 
         {% if request.user.role == "landlord" %}
-          <div>
+          <div class="d-flex gap-2">
             <button type="submit" class="btn btn-success me-2">Update Bill</button>
             <button type="button" id="copyBtn" class="btn btn-outline-secondary" onclick="copyBill()">Copy Bill</button>
           </div>
