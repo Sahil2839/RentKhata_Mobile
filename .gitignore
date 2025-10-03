@@ -20,6 +20,7 @@ env/
 /staticfiles/
 media/
 tenant_documents/
+.env
 
 # IDEs
 .vscode/
