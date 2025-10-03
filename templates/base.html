@@ -16,11 +16,26 @@
     margin: 0;
 }
 /* Remove bootstrap container padding */
-.container, .container-fluid, .content-wrapper {
+/*.container, .container-fluid, .content-wrapper {
   padding-left: 8px !important;
   padding-right: 8px !important;
   margin-left: 8px !important;
   margin-right: 8px !important;
+}*/
+.container, .container-fluid {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+@media (max-width: 576px) {
+  table {
+    font-size: 0.85rem;
+  }
+  th, td {
+    padding: 0.3rem;
+  }
 }
 
 

@@ -15,11 +15,10 @@
   </div>
 
   <!-- List Bills -->
-  <div class="card">
-    <div class="card-header">Previous Bills</div>
-    <div class="card-body p-0">
-      {% if bills %}
-      <table class="table table-striped mb-0">
+  <div class="card-body p-0">
+  {% if bills %}
+  <div class="table-responsive">
+    <table class="table table-striped mb-0 table-sm">
         <thead>
           <tr>
             <th>Created</th><th>Period</th><th>Total</th><th>Paid</th><th>Remaining</th><th>Status</th><th>Actions</th>
@@ -58,6 +57,6 @@
       {% endif %}
     </div>
   </div>
-</div>
+
 
 {% endblock %}
