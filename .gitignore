@@ -7,7 +7,7 @@ __pycache__/
 *.sqlite3
 *.sqlite
 
-# Virtualenv
+# Virtualenvs
 venv/
 renv/
 env/
@@ -15,7 +15,6 @@ env/
 # Django
 *.log
 *.pot
-*.pyc
 *.mo
 *.DS_Store
 /staticfiles/
