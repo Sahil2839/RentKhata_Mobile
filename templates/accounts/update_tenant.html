@@ -46,15 +46,25 @@
     </div>
 
     <!-- Full-width fields -->
-    {% for field in form %}
-      {% if field.name not in "rent due_amount meter_rate meter_reading" %}
+      {% for field in form %}
+        {% if field.name not in "rent due_amount meter_rate meter_reading" %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      <!-- Phone number for online tenants -->
+      {% if tenant.type_label == 'Online' %}
         <div class="mb-3">
-          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-          {{ field }}
-          {{ field.errors }}
+          <label for="id_phone_number" class="form-label">Phone Number</label>
+          <input type="text" id="id_phone_number" name="phone_number" class="form-control"
+                value="{{ tenant.phone_number }}" readonly>
         </div>
       {% endif %}
-    {% endfor %}
+
 
     <!-- Buttons -->
     <div class="mt-4 text-end">

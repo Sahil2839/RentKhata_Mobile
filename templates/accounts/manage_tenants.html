@@ -220,51 +220,45 @@
   </tbody>
 </table>  {% endcomment %}
 
-<table class="table table-bordered table-hover mt-3">
-  <thead class="table-light">
-    <tr>
-      <th>Name / Username</th>
-      <th class="d-none d-md-table-cell">Property Name</th>
-      <th class="d-none d-md-table-cell">Phone No</th>
-      <th>Rent</th>
-      <th>Due Amount</th>
-      <th>Meter Reading</th>
-      <th class="d-none d-md-table-cell">Joined On</th>
-      <th>Bill</th>
-      <th>Note</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for tenant in tenants %}
+<div class="container mt-2 px-1"> <!-- smaller padding -->
+
+  <!-- Tenants Table -->
+  <table class="table table-bordered table-hover table-sm mb-0" style="font-size:0.7rem;">
+    <thead class="table-light">
+      <tr>
+        <th>Name / Username</th>
+        <th class="d-none d-sm-table-cell">Property Name</th>
+        <th class="d-none d-sm-table-cell">Phone No</th>
+        <th>Rent</th>
+        <th>Due Amount</th>
+        <th>Meter Reading</th>
+        <th class="d-none d-sm-table-cell">Joined On</th>
+        <th>Bill</th>
+        <th>Note</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tenant in tenants %}
       <tr class="{% if tenant.pending_invite %}text-muted fst-italic{% elif tenant.status == 'pending' %}text-muted{% endif %}">
-        <!-- Name / Username -->
-        <td>
-          <span class="me-1" style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:{% if tenant.type_label == 'Offline' %}red{% else %}green{% endif %};"></span>
-          {% if tenant.is_online and show_username == '1' %}
+        <!-- Name / Username with colored dot -->
+        <td class="p-1">
+          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background-color:{% if tenant.type_label=='Offline' %}red{% else %}green{% endif %};"></span>
+          {% if tenant.is_online and show_username=='1' %}
             {{ tenant.tenant_obj.username }}
           {% else %}
             {{ tenant.name }}
           {% endif %}
         </td>
 
-        <!-- Property Name (hidden on mobile) -->
-        <td class="d-none d-md-table-cell">{{ tenant.property_name|default:"-" }}</td>
-
-        <!-- Phone Number (hidden on mobile) -->
-        <td class="d-none d-md-table-cell">{{ tenant.phone_number|default:"-" }}</td>
+        <td class="d-none d-sm-table-cell p-1">{{ tenant.property_name|default:"-" }}</td>
+        <td class="d-none d-sm-table-cell p-1">{{ tenant.phone_number|default:"-" }}</td>
 
         <!-- Rent -->
-        <td>
-          {% if tenant.rent %}
-            ₹{{ tenant.rent|intcomma }}
-          {% else %}
-            -
-          {% endif %}
-        </td>
+        <td class="p-1">{% if tenant.rent %}₹{{ tenant.rent|intcomma }}{% else %}-{% endif %}</td>
 
         <!-- Due Amount -->
-        <td>
+        <td class="p-1">
           {% if tenant.due_amount is not None %}
             {% if tenant.due_amount < 0 %}
               <span class="badge bg-primary">₹{{ tenant.due_amount }} (Advance)</span>
@@ -279,36 +273,25 @@
         </td>
 
         <!-- Meter Reading -->
-        <td>
-          {% if tenant.latest_meter %}
-            {{ tenant.latest_meter }}
-          {% else %}
-            {{ tenant.starting_meter_reading|default:0 }}
-          {% endif %}
-        </td>
+        <td class="p-1">{% if tenant.latest_meter %}{{ tenant.latest_meter }}{% else %}{{ tenant.starting_meter_reading|default:0 }}{% endif %}</td>
 
-        <!-- Joined On (hidden on mobile) -->
-        <td class="d-none d-md-table-cell">{{ tenant.start_date|default:"-" }}</td>
+        <td class="d-none d-sm-table-cell p-1">{{ tenant.start_date|default:"-" }}</td>
 
-        <!-- View Bill Button -->
-        <td>
+        <!-- View Bill -->
+        <td class="p-1">
           {% if not tenant.pending_invite %}
-            <a href="{% url 'view_bill' tenant.id tenant.type_label %}" class="btn btn-sm btn-outline-primary">View Bill</a>
+            <a href="{% url 'view_bill' tenant.id tenant.type_label %}" class="btn btn-sm btn-outline-primary py-0 px-1">View Bill</a>
           {% else %}
             <span class="text-muted fst-italic">Pending</span>
           {% endif %}
         </td>
 
         <!-- Note -->
-        <td>
+        <td class="p-1">
           {% if tenant.note %}
-            <a href="#" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#noteModal{{ tenant.id }}">
-              View / Edit
-            </a>
+            <a href="#" class="btn btn-sm btn-outline-info py-0 px-1" data-bs-toggle="modal" data-bs-target="#noteModal{{ tenant.id }}">View / Edit</a>
           {% elif not tenant.pending_invite %}
-            <a href="#" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#noteModal{{ tenant.id }}">
-              Add Note
-            </a>
+            <a href="#" class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal" data-bs-target="#noteModal{{ tenant.id }}">Add Note</a>
           {% else %}
             <span class="text-muted">-</span>
           {% endif %}
@@ -337,24 +320,27 @@
         </td>
 
         <!-- Actions -->
-        <td>
+        <td class="p-1">
           {% if tenant.pending_invite %}
             <span class="fst-italic text-muted">Pending Invite</span>
           {% else %}
-            <a href="{% url 'update_tenant' tenant.id %}" class="btn btn-sm btn-warning">View</a>
-            {% if tenant.type_label == 'Offline' %}
-              <a href="{% url 'delete_offline_tenant' tenant.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+            <a href="{% url 'update_tenant' tenant.id %}" class="btn btn-sm btn-warning py-0 px-1">View</a>
+            {% if tenant.type_label=='Offline' %}
+              <a href="{% url 'delete_offline_tenant' tenant.id %}" class="btn btn-sm btn-danger py-0 px-1" onclick="return confirm('Are you sure?')">Del</a>
             {% else %}
-              <a href="{% url 'delete_tenant_link' tenant.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+              <a href="{% url 'delete_tenant_link' tenant.id %}" class="btn btn-sm btn-danger py-0 px-1" onclick="return confirm('Are you sure?')">Del</a>
             {% endif %}
           {% endif %}
         </td>
       </tr>
-    {% empty %}
-      <tr><td colspan="10" class="text-center">No tenants found</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+      {% empty %}
+      <tr><td colspan="10" class="text-center p-1">No tenants found</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
 
 
 

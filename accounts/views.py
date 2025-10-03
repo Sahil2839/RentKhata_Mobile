@@ -418,12 +418,20 @@ def update_tenant(request, tenant_id):
 
     if request.method == "POST":
         form = FormClass(request.POST, instance=tenant)
+        # Handle phone number separately for online tenants
+        if tenant_type == "online":
+            tenant.phone_number = request.POST.get("phone_number", tenant.phone_number)
+
         if form.is_valid():
             form.save()
             messages.success(request, "Tenant updated successfully.")
             return redirect("manage_tenants")
     else:
-        form = FormClass(instance=tenant)
+        # Pre-fill phone number for online tenant
+        initial_data = {}
+        if tenant_type == "online":
+            initial_data["phone_number"] = tenant.phone_number
+        form = FormClass(instance=tenant, initial=initial_data)
 
     # Optional: mark certain fields as read-only for default view
     readonly_fields = [
