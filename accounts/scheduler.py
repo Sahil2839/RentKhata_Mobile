@@ -52,26 +52,36 @@ def generate_bills():
             previous_meter = last_bill.current_meter_reading or 0
             previous_due_amount = last_bill.remaining_due_amount or 0
         else:
+            # If no last bill, generate first bill starting from tenant's start_date
             next_start = start_date
             next_end = add_one_month(next_start) - timedelta(days=1)
             previous_meter = tenant.starting_meter_reading or 0
-            previous_due_amount = previous_due
+            previous_due_amount = previous_due or 0
 
-        # Only create bill if today >= start date
+        # Only create bill if today >= next_start
         if today >= next_start:
-            Billing.objects.create(
+            # Check if a bill already exists for this period to avoid duplicates
+            existing_bill = Billing.objects.filter(
                 offline_tenant=tenant if tenant_type == "offline" else None,
                 online_tenant=tenant if tenant_type == "online" else None,
-                rent=tenant.rent,
-                meter_rate=tenant.meter_rate or 10,
-                previous_meter_reading=previous_meter,
-                current_meter_reading=previous_meter,  # initial reading
-                previous_due_amount=previous_due_amount,
                 start_date=next_start,
-                end_date=next_end,
-            )
+                end_date=next_end
+            ).first()
 
-            bills_created += 1
+            if not existing_bill:
+                Billing.objects.create(
+                    offline_tenant=tenant if tenant_type == "offline" else None,
+                    online_tenant=tenant if tenant_type == "online" else None,
+                    rent=tenant.rent,
+                    meter_rate=tenant.meter_rate or 10,
+                    previous_meter_reading=previous_meter,
+                    current_meter_reading=previous_meter,  # initial reading
+                    previous_due_amount=previous_due_amount,
+                    start_date=next_start,
+                    end_date=next_end,
+                )
+                bills_created += 1
+                print(f"Bill created for {tenant.name} ({tenant_type}) from {next_start} to {next_end}")
 
     print(f"{bills_created} bills created on {today}")
 
