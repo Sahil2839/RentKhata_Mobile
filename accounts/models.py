@@ -3,8 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
-from django.utils import timezone
-
+from django.core.validators import RegexValidator
 # Create your models here.
     
 class CustomUser(AbstractUser):
@@ -19,7 +18,20 @@ class CustomUser(AbstractUser):
         default='guest'
     )
     username = models.CharField(max_length=20, unique=True, null=False, blank=False)
-    phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
+    phone_number = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex=r'^\d{10}$',
+                message='Phone number must be exactly 10 digits.',
+                code='invalid_phone'
+            )
+        ],
+        help_text='Enter 10 digit phone number, numbers only.'
+    )
     email = models.EmailField(null=True, blank=True)
     
     USERNAME_FIELD = 'username'
