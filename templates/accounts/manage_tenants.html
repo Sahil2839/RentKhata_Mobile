@@ -89,7 +89,7 @@
 </div>
 
 <!-- Tenants Table -->
-<table class="table table-bordered table-hover mt-3">
+{% comment %} <table class="table table-bordered table-hover mt-3">
   <thead class="table-light">
     <tr>
       <th>Name / Username</th>
@@ -216,7 +216,106 @@
       <tr><td colspan="10" class="text-center">No tenants found</td></tr>
     {% endfor %}
   </tbody>
-</table>
+</table> {% endcomment %}
+
+<div class="table-responsive">
+  <table class="table table-bordered table-hover mt-3">
+    <thead class="table-light">
+      <tr>
+        <th>Name / Username</th>
+        <th class="d-none d-md-table-cell">Property Name</th>
+        <th class="d-none d-md-table-cell">Phone No</th>
+        <th>Rent</th>
+        <th>Due Amount</th>
+        <th>Meter Reading</th>
+        <th class="d-none d-md-table-cell">Joined On</th>
+        <th>Bill</th>
+        <th>Note</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tenant in tenants %}
+        <tr class="{% if tenant.pending_invite %}text-muted fst-italic{% elif tenant.status == 'pending' %}text-muted{% endif %}">
+          
+          <td>
+            <span class="me-1" style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:{% if tenant.type_label == 'Offline' %}red{% else %}green{% endif %};"></span>
+            {% if tenant.is_online and show_username == '1' %}
+              {{ tenant.tenant_obj.username }}
+            {% else %}
+              {{ tenant.name }}
+            {% endif %}
+          </td>
+
+          <!-- Property Name (hidden on mobile) -->
+          <td class="d-none d-md-table-cell">{{ tenant.property_name|default:"-" }}</td>
+          <!-- Phone No (hidden on mobile) -->
+          <td class="d-none d-md-table-cell">{{ tenant.phone_number|default:"-" }}</td>
+
+          <td>₹{{ tenant.rent|intcomma|default:"-" }}</td>
+
+          <td>
+            {% if tenant.due_amount is not None %}
+              {% if tenant.due_amount < 0 %}
+                <span class="badge bg-primary">₹{{ tenant.due_amount }} (Advance)</span>
+              {% elif tenant.due_amount == 0 %}
+                <span class="badge bg-success">₹0 (Clear)</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">₹{{ tenant.due_amount }} (Pending)</span>
+              {% endif %}
+            {% else %}
+              <span class="badge bg-secondary">-</span>
+            {% endif %}
+          </td>
+
+          <td>{{ tenant.latest_meter|default:tenant.starting_meter_reading|default:0 }}</td>
+
+          <!-- Joined On (hidden on mobile) -->
+          <td class="d-none d-md-table-cell">{{ tenant.start_date|default:"-" }}</td>
+
+          <td>
+            {% if not tenant.pending_invite %}
+              <a href="{% url 'view_bill' tenant.id tenant.type_label %}" class="btn btn-sm btn-outline-primary">
+                View
+              </a>
+            {% else %}
+              <span class="text-muted fst-italic">Pending</span>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if tenant.note %}
+              <a href="#" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#noteModal{{ tenant.id }}">
+                View / Edit
+              </a>
+            {% else %}
+              <a href="#" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#noteModal{{ tenant.id }}">
+                Add Note
+              </a>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if tenant.pending_invite %}
+              <span class="fst-italic text-muted">Pending Invite</span>
+            {% else %}
+              <a href="{% url 'update_tenant' tenant.id %}" class="btn btn-sm btn-warning">Edit</a>
+              {% if tenant.type_label == 'Offline' %}
+                <a href="{% url 'delete_offline_tenant' tenant.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+              {% else %}
+                <a href="{% url 'delete_tenant_link' tenant.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+              {% endif %}
+            {% endif %}
+          </td>
+
+        </tr>
+      {% empty %}
+        <tr><td colspan="10" class="text-center">No tenants found</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
