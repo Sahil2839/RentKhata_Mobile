@@ -38,12 +38,8 @@ def generate_bills():
         else:
             last_bill = tenant.online_bill.order_by('-end_date').first()
 
-        # Tenant values
-        rent = getattr(tenant, "rent", 0)
-        meter_rate = getattr(tenant, "meter_rate", 10)
-        starting_meter_reading = getattr(tenant, "starting_meter_reading", 0)
-        previous_due = getattr(tenant, "due_amount", 0)
-        start_date = getattr(tenant, "start_date", today)
+        # Tenant start date
+        tenant_start_date = getattr(tenant, "start_date", date.today()) or date.today()
 
         # Determine next billing period
         if last_bill:
@@ -52,11 +48,12 @@ def generate_bills():
             previous_meter = last_bill.current_meter_reading or 0
             previous_due_amount = last_bill.remaining_due_amount or 0
         else:
-            # If no last bill, generate first bill starting from tenant's start_date
-            next_start = start_date
+            # For new tenants: always generate first bill
+            next_start = tenant_start_date
             next_end = add_one_month(next_start) - timedelta(days=1)
-            previous_meter = tenant.starting_meter_reading or 0
-            previous_due_amount = previous_due or 0
+            previous_meter = getattr(tenant, "starting_meter_reading", 0)
+            previous_due_amount = getattr(tenant, "due_amount", 0)
+
 
         # Only create bill if today >= next_start
         if today >= next_start:
@@ -80,10 +77,9 @@ def generate_bills():
                     start_date=next_start,
                     end_date=next_end,
                 )
-                bills_created += 1
-                print(f"Bill created for {tenant.name} ({tenant_type}) from {next_start} to {next_end}")
+                tenant_name = tenant.name if tenant_type == "offline" else tenant.tenant.full_name
+                print(f"Bill created for {tenant_name} ({tenant_type}) from {next_start} to {next_end}")
 
-    print(f"{bills_created} bills created on {today}")
 
 # --- Start scheduler ---
 def start_scheduler(test_mode=False):
