@@ -32,6 +32,5 @@ urlpatterns = [
     path('register-as-tenant/', views.register_as_tenant, name='register_as_tenant'),
     path('profile/', views.profile, name='profile'),
     path("password_change/",views.CustomPasswordChangeView.as_view(), name="password_change"),
-    path('temp-create-superuser/', views.create_superuser_view),
 
 ]

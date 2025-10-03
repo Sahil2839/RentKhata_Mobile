@@ -126,6 +126,7 @@ def manage_tenants(request):
             starting_meter_reading = invite_form.cleaned_data.get("starting_meter_reading") or 0
             start_date = invite_form.cleaned_data.get("start_date")
             end_date = invite_form.cleaned_data.get("end_date")
+            note = invite_form.cleaned_data.get("note")
 
             try:
                 tenant_user = CustomUser.objects.get(
@@ -152,7 +153,8 @@ def manage_tenants(request):
                         starting_meter_reading=starting_meter_reading,
                         start_date=start_date,
                         end_date=end_date,
-                        due_amount=due_amount
+                        due_amount=due_amount,
+                        note=note or ""
                     )
                     messages.success(request, f"Invite sent to {tenant_user.username}.")
 
@@ -796,17 +798,3 @@ class CustomPasswordChangeView(PasswordChangeView):
         messages.success(self.request, "Password changed successfully ✅")
         return reverse_lazy("profile")
     
-
-def create_superuser_view(request):
-    # Change these values to whatever you want
-    username = "admin"
-    email = "sahilch2839@gmail.com"
-    password = "SAHILchWOW(1)!"
-
-    User = get_user_model()
-
-    if User.objects.filter(username=username).exists():
-        return HttpResponse("Superuser already exists.")
-
-    User.objects.create_superuser(username=username, email=email, password=password)
-    return HttpResponse("Superuser created successfully!")

@@ -73,6 +73,7 @@ class LinkRequest(models.Model):
     starting_meter_reading = models.IntegerField(blank=True, null=True, default=0)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

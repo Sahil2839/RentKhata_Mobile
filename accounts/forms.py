@@ -173,10 +173,10 @@ class InviteTenantForm(forms.Form):
         required=True, 
         widget=forms.DateInput(attrs={'type': 'date','required': True, 'class': 'form-control'})
     )
-    notes = forms.CharField(
+    note = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={'class': 'form-control notes-input', 'rows': 2}),
-        label="Notes"
+        label="Note"
     )
 
 
