@@ -410,26 +410,36 @@ def update_tenant(request, tenant_id):
         tenant = get_object_or_404(LinkTenantLandlord, id=tenant_id, landlord=landlord)
         tenant_type = "online"
 
-    if request.method == "POST":
-        if tenant_type == "offline":
-            form = OfflineTenantForm(request.POST, instance=tenant)
-        else:
-            form = OnlineTenantForm(request.POST, instance=tenant)
+    # Determine which form to use
+    if tenant_type == "offline":
+        FormClass = OfflineTenantForm
+    else:
+        FormClass = OnlineTenantForm
 
+    if request.method == "POST":
+        form = FormClass(request.POST, instance=tenant)
         if form.is_valid():
             form.save()
             messages.success(request, "Tenant updated successfully.")
             return redirect("manage_tenants")
     else:
-        if tenant_type == "offline":
-            form = OfflineTenantForm(instance=tenant)
-        else:
-            form = OnlineTenantForm(instance=tenant)
+        form = FormClass(instance=tenant)
+
+    # Optional: mark certain fields as read-only for default view
+    readonly_fields = [
+        "rent", "due_amount", "meter_rate", "meter_reading",
+        "phone_number", "property_name", "start_date"
+    ]
+    for field_name in readonly_fields:
+        if field_name in form.fields:
+            form.fields[field_name].widget.attrs["readonly"] = True
 
     return render(request, "accounts/update_tenant.html", {
         "form": form,
         "tenant_type": tenant_type,
+        "tenant": tenant,
     })
+
 
 
 

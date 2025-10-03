@@ -2,8 +2,8 @@
 
 {% block content %}
 <div class="container mt-5" style="max-width:700px;">
-  <h2 class="mb-4">Edit Tenant - {{ tenant.name }}</h2>
-  <form method="POST">
+  <h2 class="mb-4">Tenant - {{ tenant.name }}</h2>
+  <form method="POST" id="tenantForm">
     {% csrf_token %}
     {{ form.non_field_errors }}
 
@@ -56,11 +56,35 @@
       {% endif %}
     {% endfor %}
 
-    <!-- Submit buttons -->
+    <!-- Buttons -->
     <div class="mt-4 text-end">
       <a href="{% url 'manage_tenants' %}" class="btn btn-secondary me-2">Cancel</a>
-      <button type="submit" class="btn btn-success">Save Changes</button>
+      <button type="button" id="editBtn" class="btn btn-outline-primary">Edit</button>
+      <button type="submit" id="saveBtn" class="btn btn-success" style="display:none;">Save Changes</button>
     </div>
   </form>
 </div>
+
+<script>
+  const editBtn = document.getElementById('editBtn');
+  const saveBtn = document.getElementById('saveBtn');
+
+  // Select all input, textarea, select fields
+  const formFields = document.querySelectorAll('#tenantForm input, #tenantForm select, #tenantForm textarea');
+
+  // Fields are readonly/disabled by default (set in view)
+  formFields.forEach(f => {
+    if (f.tagName === 'SELECT') f.disabled = true;
+    else f.readOnly = true;
+  });
+
+  editBtn.addEventListener('click', () => {
+    formFields.forEach(f => {
+      if (f.tagName === 'SELECT') f.disabled = false;
+      else f.readOnly = false;
+    });
+    editBtn.style.display = 'none';
+    saveBtn.style.display = 'inline-block';
+  });
+</script>
 {% endblock %}
