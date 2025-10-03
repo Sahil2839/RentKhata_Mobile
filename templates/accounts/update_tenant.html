@@ -1,23 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5" style="max-width:700px;">
-  <h2 class="mb-4">Tenant - {{ tenant.name }}</h2>
+<div class="container mt-5" style="max-width:800px;">
+  <h2 class="mb-4">
+  {% if tenant_type == "online" %}
+    Tenant - {{ tenant.tenant.username }}
+  {% else %}
+    Tenant - {{ tenant.name }}
+  {% endif %}
+</h2>
+
   <form method="POST" id="tenantForm">
     {% csrf_token %}
     {{ form.non_field_errors }}
 
-    <!-- Row 1: Rent | Due Amount -->
+    <!-- Top row: Rent | Due Amount | Meter Rate | Starting Meter Reading -->
     <div class="row g-3 mb-3">
       {% for field in form %}
-        {% if field.name == "rent" %}
-          <div class="col-md-6">
-            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-            {{ field }}
-            {{ field.errors }}
-          </div>
-        {% elif field.name == "due_amount" %}
-          <div class="col-md-6">
+        {% if field.name in "rent due_amount meter_rate starting_meter_reading" %}
+          <div class="col-md-3">
             <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
             {{ field }}
             {{ field.errors }}
@@ -26,45 +27,26 @@
       {% endfor %}
     </div>
 
-    <!-- Row 2: Meter Rate | Meter Reading -->
+     <!-- Tenant Phone Number (read-only for online tenants) -->
+    {% if tenant_type == "online" %}
     <div class="row g-3 mb-3">
-      {% for field in form %}
-        {% if field.name == "meter_rate" %}
-          <div class="col-md-6">
-            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-            {{ field }}
-            {{ field.errors }}
-          </div>
-        {% elif field.name == "meter_reading" %}
-          <div class="col-md-6">
-            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-            {{ field }}
-            {{ field.errors }}
-          </div>
-        {% endif %}
-      {% endfor %}
+      <div class="col-md-12">
+        <label class="form-label">Tenant Phone Number</label>
+        <input type="text" class="form-control" value="{{ tenant.tenant.phone_number }}" readonly>
+      </div>
     </div>
+    {% endif %}
 
     <!-- Full-width fields -->
-      {% for field in form %}
-        {% if field.name not in "rent due_amount meter_rate meter_reading" %}
-          <div class="mb-3">
-            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-            {{ field }}
-            {{ field.errors }}
-          </div>
-        {% endif %}
-      {% endfor %}
-
-      <!-- Phone number for online tenants -->
-      {% if tenant.type_label == 'Online' %}
-        <div class="mb-3">
-          <label for="id_phone_number" class="form-label">Phone Number</label>
-          <input type="text" id="id_phone_number" name="phone_number" class="form-control"
-                value="{{ tenant.phone_number }}" readonly>
-        </div>
+    {% for field in form %}
+      {% if field.name not in "rent due_amount meter_rate starting_meter_reading" %}
+      <div class="mb-3">
+        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+      </div>
       {% endif %}
-
+    {% endfor %}
 
     <!-- Buttons -->
     <div class="mt-4 text-end">
@@ -82,7 +64,7 @@
   // Select all input, textarea, select fields
   const formFields = document.querySelectorAll('#tenantForm input, #tenantForm select, #tenantForm textarea');
 
-  // Fields are readonly/disabled by default (set in view)
+  // Make fields readonly/disabled by default
   formFields.forEach(f => {
     if (f.tagName === 'SELECT') f.disabled = true;
     else f.readOnly = true;

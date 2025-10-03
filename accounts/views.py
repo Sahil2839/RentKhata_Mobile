@@ -6,7 +6,7 @@ from django.db.models import Q
 from .forms import CustomUserCreationForm, CustomLogin
 from .decorators import guest_required, landlord_required, tenant_required
 from .models import CustomUser, LandlordRequest, OfflineTenants, LinkTenantLandlord, LinkRequest, Billing, ChatMessage, TenantDocument
-from .forms import OfflineTenantForm, InviteTenantForm, OnlineTenantForm, TenantDocumentForm, ProfileForm
+from .forms import OfflineTenantForm, InviteTenantForm, EditTenantForm, TenantDocumentForm, ProfileForm
 from datetime import date
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponse
 from django.contrib.auth import get_user_model
@@ -410,33 +410,25 @@ def update_tenant(request, tenant_id):
         tenant = get_object_or_404(LinkTenantLandlord, id=tenant_id, landlord=landlord)
         tenant_type = "online"
 
-    # Determine which form to use
+    # Select form class
     if tenant_type == "offline":
         FormClass = OfflineTenantForm
     else:
-        FormClass = OnlineTenantForm
+        FormClass = EditTenantForm
 
     if request.method == "POST":
         form = FormClass(request.POST, instance=tenant)
-        # Handle phone number separately for online tenants
-        if tenant_type == "online":
-            tenant.phone_number = request.POST.get("phone_number", tenant.phone_number)
-
         if form.is_valid():
             form.save()
             messages.success(request, "Tenant updated successfully.")
             return redirect("manage_tenants")
     else:
-        # Pre-fill phone number for online tenant
-        initial_data = {}
-        if tenant_type == "online":
-            initial_data["phone_number"] = tenant.phone_number
-        form = FormClass(instance=tenant, initial=initial_data)
+        form = FormClass(instance=tenant)
 
-    # Optional: mark certain fields as read-only for default view
+    # Make fields read-only by default
     readonly_fields = [
-        "rent", "due_amount", "meter_rate", "meter_reading",
-        "phone_number", "property_name", "start_date"
+        "rent", "due_amount", "meter_rate", "starting_meter_reading",
+        "property_name", "start_date"
     ]
     for field_name in readonly_fields:
         if field_name in form.fields:

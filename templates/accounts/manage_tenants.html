@@ -220,7 +220,7 @@
   </tbody>
 </table>  {% endcomment %}
 
-<div class="container mt-2 px-1"> <!-- smaller padding -->
+<div class="container-fluid mt-2 px-1"> <!-- smaller padding -->
 
   <!-- Tenants Table -->
   <table class="table table-bordered table-hover table-sm mb-0" style="font-size:0.7rem;">
@@ -326,9 +326,9 @@
           {% else %}
             <a href="{% url 'update_tenant' tenant.id %}" class="btn btn-sm btn-warning py-0 px-1">View</a>
             {% if tenant.type_label == 'Offline' %}
-              <a href="{% url 'delete_offline_tenant' tenant.id %}" class="btn btn-sm btn-danger py-0 px-1" onclick="return confirm('Are you sure?')">Del</a>
+              <a href="{% url 'delete_offline_tenant' tenant.id %}" class="btn btn-sm btn-danger py-0 px-1" onclick="return confirm('Are you sure?')">Delete</a>
             {% else %}
-              <a href="{% url 'delete_tenant_link' tenant.id %}" class="btn btn-sm btn-danger py-0 px-1" onclick="return confirm('Are you sure?')">Del</a>
+              <a href="{% url 'delete_tenant_link' tenant.id %}" class="btn btn-sm btn-danger py-0 px-1" onclick="return confirm('Are you sure?')">Delete</a>
             {% endif %}
           {% endif %}
         </td>

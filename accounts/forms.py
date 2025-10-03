@@ -4,6 +4,7 @@ from .models import CustomUser, OfflineTenants, TenantDocument
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import PasswordChangeForm
+from .models import LinkTenantLandlord
 
 
 
@@ -180,10 +181,11 @@ class InviteTenantForm(forms.Form):
     )
 
 
-class OnlineTenantForm(forms.ModelForm):
+class EditTenantForm(forms.ModelForm):
     class Meta:
-        model = OfflineTenants
-        fields = [ 'property_name', 'rent', 'due_amount','meter_rate', 'starting_meter_reading', 'start_date', 'note']
+        model = OfflineTenants  # or LinkTenantLandlord depending on your model
+        fields = [ 'property_name', 'rent', 'due_amount', 'meter_rate',
+                   'starting_meter_reading', 'start_date', 'note']
         widgets = {
             'property_name': forms.TextInput(attrs={'class': 'form-control'}),
             'rent': forms.NumberInput(attrs={'class': 'form-control'}),
@@ -193,6 +195,7 @@ class OnlineTenantForm(forms.ModelForm):
             'start_date': forms.DateInput(attrs={'type':'date','required': True, 'class':'form-control'}),
             'note': forms.Textarea(attrs={'class':'form-control notes-input','rows':2})
         }
+
 
 
 class TenantDocumentForm(forms.ModelForm):
