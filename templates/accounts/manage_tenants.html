@@ -243,8 +243,8 @@
       <tr class="{% if tenant.pending_invite %}text-muted fst-italic{% elif tenant.status == 'pending' %}text-muted{% endif %}">
         <!-- Name / Username with colored dot -->
         <td class="p-1">
-          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background-color:{% if tenant.type_label=='Offline' %}red{% else %}green{% endif %};"></span>
-          {% if tenant.is_online and show_username=='1' %}
+          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background-color:{% if tenant.type_label == 'Offline' %}red{% else %}green{% endif %};"></span>
+          {% if tenant.is_online and show_username == '1' %}
             {{ tenant.tenant_obj.username }}
           {% else %}
             {{ tenant.name }}
@@ -325,7 +325,7 @@
             <span class="fst-italic text-muted">Pending Invite</span>
           {% else %}
             <a href="{% url 'update_tenant' tenant.id %}" class="btn btn-sm btn-warning py-0 px-1">View</a>
-            {% if tenant.type_label=='Offline' %}
+            {% if tenant.type_label == 'Offline' %}
               <a href="{% url 'delete_offline_tenant' tenant.id %}" class="btn btn-sm btn-danger py-0 px-1" onclick="return confirm('Are you sure?')">Del</a>
             {% else %}
               <a href="{% url 'delete_tenant_link' tenant.id %}" class="btn btn-sm btn-danger py-0 px-1" onclick="return confirm('Are you sure?')">Del</a>
