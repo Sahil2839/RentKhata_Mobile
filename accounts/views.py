@@ -94,7 +94,7 @@ def landlord_request(request):
 
     return redirect('guest_dashboard')
 
-
+ 
 @login_required
 @landlord_required
 def manage_tenants(request):
