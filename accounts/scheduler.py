@@ -1,6 +1,6 @@
 import calendar
 from datetime import date, timedelta
-from apscheduler.schedulers.background import BackgroundScheduler
+# from apscheduler.schedulers.background import BackgroundScheduler
 from .models import OfflineTenants, LinkTenantLandlord, Billing
 
 # --- Helper to add one month ---
@@ -82,9 +82,9 @@ def generate_bills():
 
 
 # --- Start scheduler ---
-def start_scheduler(test_mode=False):
-    scheduler = BackgroundScheduler()
-    interval_seconds = 10 if test_mode else 86400  # 1 day
-    scheduler.add_job(generate_bills, 'interval', seconds=interval_seconds, id='generate_bills')
-    scheduler.start()
-    print(f"Scheduler started ({'test mode' if test_mode else 'daily mode'})")
+# def start_scheduler(test_mode=False):
+#     scheduler = BackgroundScheduler()
+#     interval_seconds = 10 if test_mode else 86400  # 1 day
+#     scheduler.add_job(generate_bills, 'interval', seconds=interval_seconds, id='generate_bills')
+#     scheduler.start()
+#     print(f"Scheduler started ({'test mode' if test_mode else 'daily mode'})")

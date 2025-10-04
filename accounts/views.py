@@ -11,7 +11,7 @@ from datetime import date
 from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import PasswordChangeView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
 
 # Create your views here.
@@ -494,8 +494,13 @@ def view_bill(request, tenant_id, tenant_type):
 def bill_detail(request, bill_id):
     bill = get_object_or_404(Billing, id=bill_id)
 
+    # Determine tenant info
     tenant = bill.offline_tenant or bill.online_tenant
-    tenant_name = bill.offline_tenant.name if bill.offline_tenant else bill.online_tenant.tenant.username
+    tenant_name = tenant.name if bill.offline_tenant else tenant.tenant.username
+    tenant_type = "offline" if bill.offline_tenant else "online"
+
+    # Decide back_url
+    back_url = request.POST.get("next") or request.GET.get("next") or reverse("view_bill", args=[tenant.id, tenant_type])
 
     if bill.current_meter_reading is None:
         bill.current_meter_reading = bill.previous_meter_reading or 0
@@ -513,6 +518,7 @@ def bill_detail(request, bill_id):
 
         # ✅ Handle remove photo checkbox
         if request.POST.get("remove_photo"):
+            back_url = request.POST.get("next") or reverse("view_bill", args=[tenant.id, tenant_type])
             bill.meter_photo.delete(save=False)  # delete file from storage
             bill.meter_photo = None
 
@@ -578,7 +584,10 @@ def bill_detail(request, bill_id):
             prev_due = remaining_due_b
 
         messages.success(request, "Bill and subsequent bills updated successfully.")
-        return redirect("bill_detail", bill_id=bill.id)
+        return redirect(f"{reverse('bill_detail', args=[bill.id])}?next={back_url}")
+    else:
+        # GET request: check if next is in query params
+        back_url = request.GET.get("next") or reverse("view_bill", args=[tenant.id, tenant_type])
 
     # For template display
     consumption_units = bill.current_meter_reading - bill.previous_meter_reading
@@ -588,12 +597,15 @@ def bill_detail(request, bill_id):
 
     context = {
         "bill": bill,
+        "tenant": tenant,
+        "tenant_type": tenant_type,
         "tenant_name": tenant_name,
         "previous_meter": bill.previous_meter_reading or 0,
         "consumption_units": consumption_units,
         "meter_bill_amount": meter_bill_amount,
         "total_amount": total_amount,
         "remaining_due": remaining_due,
+        "back_url": back_url,
     }
 
     return render(request, "accounts/bill_detail.html", context)

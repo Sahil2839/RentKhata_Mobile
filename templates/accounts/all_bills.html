@@ -57,7 +57,7 @@
             <td>₹{{ bill.remaining_due|intcomma }}</td>
             <td>{{ bill.get_status_display }}</td>
             <td>
-              <a href="{% url 'bill_detail' bill.id %}" class="btn btn-sm btn-info">View</a>
+              <a href="{% url 'bill_detail' bill.id %}?next={{ request.get_full_path }}" class="btn btn-sm btn-info">View</a>
             </td>
           </tr>
           {% endfor %}

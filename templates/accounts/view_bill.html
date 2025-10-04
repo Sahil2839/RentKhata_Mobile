@@ -57,7 +57,7 @@
               {% endwith %}
             </td>
             <td>
-              <a href="{% url 'bill_detail' bill.id %}" class="btn btn-sm btn-primary">View</a>
+              <a href="{% url 'bill_detail' bill.id %}?next={{ request.get_full_path }}" class="btn btn-sm btn-primary">View</a>
             </td>
           </tr>
           {% endfor %}
