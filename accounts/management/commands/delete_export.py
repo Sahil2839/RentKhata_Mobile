@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from accounts.models import Billing, OfflineTenants
+from accounts.models import Billing, OfflineTenants, LinkTenantLandlord
 
 class Command(BaseCommand):
     help = "Delete old bills on mobile, keep only latest bill per tenant"
@@ -7,10 +7,19 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         total_deleted = 0
 
+        # Offline tenants
         for tenant in OfflineTenants.objects.all():
             bills = Billing.objects.filter(offline_tenant=tenant).order_by('-created_at')
             if bills.count() > 1:
-                # Keep the latest, delete all others
+                latest_bill = bills.first()
+                bills_to_delete = bills.exclude(id=latest_bill.id)
+                deleted_count, _ = bills_to_delete.delete()
+                total_deleted += deleted_count
+
+        # Online tenants
+        for link in LinkTenantLandlord.objects.all():
+            bills = Billing.objects.filter(online_tenant=link).order_by('-created_at')
+            if bills.count() > 1:
                 latest_bill = bills.first()
                 bills_to_delete = bills.exclude(id=latest_bill.id)
                 deleted_count, _ = bills_to_delete.delete()
@@ -18,4 +27,4 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(
             f"Deleted {total_deleted} old bills. Each tenant now has only 1 latest bill."
-            ))
+        ))
