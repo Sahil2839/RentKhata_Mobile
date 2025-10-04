@@ -1,15 +1,25 @@
 # accounts/management/commands/delete_old_mobile_bills.py
 
 from django.core.management.base import BaseCommand
-from accounts.models import Tenant, Billing
+from accounts.models import OfflineTenants, LinkTenantLandlord, Billing
 
 class Command(BaseCommand):
     help = "Delete old bills on mobile, keep only latest bill per tenant"
 
     def handle(self, *args, **kwargs):
         total_deleted = 0
-        for tenant in Tenant.objects.all():
-            bills = Billing.objects.filter(tenant=tenant).order_by('-created_at')
+
+        # Offline tenants
+        for tenant in OfflineTenants.objects.all():
+            bills = Billing.objects.filter(offline_tenant=tenant).order_by('-created_at')
+            if bills.count() > 1:
+                bills_to_delete = bills[1:]  # keep the latest, delete older
+                deleted_count, _ = bills_to_delete.delete()
+                total_deleted += deleted_count
+
+        # Online tenants
+        for link in LinkTenantLandlord.objects.all():
+            bills = Billing.objects.filter(online_tenant=link).order_by('-created_at')
             if bills.count() > 1:
                 bills_to_delete = bills[1:]
                 deleted_count, _ = bills_to_delete.delete()
